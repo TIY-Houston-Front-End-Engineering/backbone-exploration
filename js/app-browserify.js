@@ -40,15 +40,37 @@ window.Forecast = backbone.Model.extend({
     }
 })
 
-var forecast_html = (forecastJSON) => `<div>
-    <p>${forecastJSON.currently.temperature}</p>
-    <span>${new Date().toLocaleTimeString()}</span>
-</div>`
-
 var f = new Forecast({lat:26, lng: -90})
 
-f.on('sync', function(model){
-    document.body.innerHTML = forecast_html(model.toJSON())
+var ForecastView = backbone.View.extend({
+    el: '.container',
+    id: 'forecast-view',
+    events: {
+        "click": "alert1",
+        "click a": "alert2"
+    },
+    alert1: function(){
+        alert(1)
+    },
+    alert2: function(){
+        alert(2)
+    },
+    template: (forecastJSON) => `<div>
+        <p>${forecastJSON.currently.temperature}</p>
+        <span>${new Date().toLocaleTimeString()}</span>
+    </div>`,
+    render: function(data){
+        this.el.innerHTML = this.template(data)
+    },
+    initialize: function(){
+        this.listenTo(this.model, "sync", function(m){
+            this.render(m.toJSON())
+        })
+    }
+})
+
+window.x = new ForecastView({
+    model: f
 })
 
 setInterval(() => {
@@ -56,12 +78,3 @@ setInterval(() => {
 }, 5*1000)
 
 f.fetch()
-
-
-
-
-
-
-
-
-
